@@ -98,7 +98,7 @@ async def deduplicate_data():
             deduplicated_json = deduplicated_df.to_json(orient="records")
             del deduplicated_df
           
-            return JSONResponse(content=deduplicated_json, media_type='application/json')
+            return Response(content=deduplicated_json, media_type='application/json')
         
         except Exception as e:
             logger.error(f"An error occurred during deduplication: {e}")
