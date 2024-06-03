@@ -82,22 +82,34 @@ async def deduplicate_data():
             deduplicated_data = []
             chunk_size = 10000  
             
+            SUB= ["street", "locality", "town", "district", "county"]
+
             for chunk in pd.read_csv(DATA_FILE, chunksize=chunk_size, header=None, names=column_names, dtype=str):
-                deduplicated_chunk = chunk.drop_duplicates(subset=["street", "locality", "town", "district", "county"])
+                deduplicated_chunk = chunk.drop_duplicates(subset=SUB)
                 deduplicated_data.append(deduplicated_chunk)
             
             deduplicated_df = pd.concat(deduplicated_data, ignore_index=True)
             deduplicated_df.to_csv(DATA_FOLDER / "deduplicated_uk_property_dataset.csv", index=False)
-            
+            deduplicated_df.drop_duplicates(subset=SUB,inplace=True)
             deduplicated_df.replace({pd.NA: None, float('inf'): None, float('-inf'): None}, inplace=True)
 
             end_time = time()
             duration = end_time - start_time
-            logger.info(f"Data deduplication completed successfully in {duration:.2f} seconds.")
+            
+            import pdb; pdb.set_trace()
             
             deduplicated_json = deduplicated_df.to_json(orient="records")
             del deduplicated_df
-          
+
+            Dedup_JSON="deduplicated_json.String.txt"
+
+            logger.info(f"Data deduplication completed successfully in {duration:.2f} seconds.")
+            with open(Dedup_JSON, "w") as f:
+                f.write(deduplicated_json)
+                f.flush()
+            
+            #eturn FileResponse(Dedup_JSON)
+
             return Response(content=deduplicated_json, media_type='application/json')
         
         except Exception as e:
@@ -106,7 +118,6 @@ async def deduplicate_data():
     else:
         logger.warning("Data file not found for deduplication.")
         return JSONResponse(status_code=404, content={"message": "Data file not found for deduplication"})
-
 column_types = {column: 'object' for column in column_names}
 
 @app.get("/data/{uuid}")
