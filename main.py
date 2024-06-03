@@ -97,10 +97,8 @@ async def deduplicate_data():
             
             deduplicated_json = deduplicated_df.to_json(orient="records")
             del deduplicated_df
-            deduplicated_output = json.loads(deduplicated_json)
-
-            json_str = json.dumps(deduplicated_output, indent=4, default=str)
-            return JSONResponse(content=json_str, media_type='application/json')
+          
+            return JSONResponse(content=deduplicated_json, media_type='application/json')
         
         except Exception as e:
             logger.error(f"An error occurred during deduplication: {e}")
@@ -127,6 +125,6 @@ async def get_data(uuid: str):
 
             return filtered_data[0] 
         else:
-            raise HTTPException(status_code=404, detail="UUID not found.")
+            raise HTTPException(status_code=400, detail="UUID not found.")
     except Exception as e:
         raise HTTPException(status_code=500, detail="Internal server error.") from e
