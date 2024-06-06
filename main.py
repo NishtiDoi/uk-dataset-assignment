@@ -95,13 +95,11 @@ async def deduplicate_data():
 
             deduplicated_list = deduplicated_df.to_dict(orient="records")
 
-            dedup_json_file = DATA_FOLDER / "deduplicated_json.String.txt"
+            dedup_json_file = DATA_FOLDER / "deduplicated_json"
             with open(dedup_json_file, "w") as f:
                 json.dump(deduplicated_list, f, indent=4)
 
             logger.info(f"Data deduplication completed successfully in {duration:.2f} seconds.")
-            
-            # Return JSON response
             return Response(content=json.dumps(deduplicated_list), media_type='application/json')
         
         except Exception as e:
